@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>English → Vietnamese Translator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h2>English → Vietnamese Translator</h2>
+
+    <textarea id="inputText" placeholder="Enter English text here..."></textarea>
+    <button id="translateBtn">Translate</button>
+
+    <div id="result" class="result" style="display:none;"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const btn = document.getElementById("translateBtn");
+            const resultDiv = document.getElementById("result");
+            const inputText = document.getElementById("inputText");
+
+            btn.addEventListener("click", async () => {
+                const text = inputText.value.trim();
+                if (!text) {
+                    resultDiv.style.display = "block";
+                    resultDiv.innerHTML = "<span class='error'>Please enter text to translate.</span>";
+                    return;
+                }
+
+                resultDiv.style.display = "block";
+                resultDiv.innerHTML = "<i>Translating...</i>";
+
+                try {
+                    const response = await fetch("/translate", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ text })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.translation) {
+                        resultDiv.innerHTML = "<b>Translation:</b><br>" + data.translation;
+                    } else {
+                        resultDiv.innerHTML = `<span class='error'>Error: ${data.error || "Unknown error"}</span>`;
+                    }
+                } catch (err) {
+                    resultDiv.innerHTML = `<span class='error'>Failed to connect to server: ${err}</span>`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
