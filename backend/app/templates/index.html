@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>En2Vi Translator</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h2>En2Vi Translator</h2>
+
+    <form method="post">
+
+        <div class="row">
+            <label class="label">English text</label>
+            <textarea
+                id="source_text"
+                name="text"
+                rows="8"
+                placeholder="Enter English text here..."
+            >{{ source_text }}</textarea>
+        </div>
+
+        <div class="row">
+            <label class="label">Max tokens per chunk</label>
+            <select name="max_tokens">
+                <option value="256" {% if max_tokens == 256 %}selected{% endif %}>256</option>
+                <option value="512" {% if max_tokens == 512 %}selected{% endif %}>512</option>
+                <option value="768" {% if max_tokens == 768 %}selected{% endif %}>768</option>
+                <option value="1024" {% if max_tokens == 1024 %}selected{% endif %}>1024</option>
+            </select>
+        </div>
+
+        <div class="row buttons">
+            <button type="submit">Translate</button>
+            <button type="button" class="clear-btn" onclick="clearText()">Clear</button>
+        </div>
+
+    </form>
+
+    <div class="row">
+        <label class="label">Vietnamese translation</label>
+        <textarea
+            id="translation"
+            rows="8"
+            readonly
+            placeholder="Translation will appear here..."
+        >{{ translation }}</textarea>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>
