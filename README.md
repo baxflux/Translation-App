@@ -1,130 +1,271 @@
-<h1 align="center">
-Translation App
-</h1>
+<a id="readme-top"></a>
 
-<p align="center" style="color:gray;">
-(Ứng dụng dịch thuật)
-</p>
+<h1 align="center">Translation App</h1>
 
-<hr>
+<h4 align="center" style="color: #555">
+  An application for translating from English to Vietnamese
+</h4>
 
-## MỤC LỤC
-
-- [GIỚI THIỆU TỔNG QUÁT](#giới-thiệu-tổng-quát)
-- [BỘ DỮ LIỆU](#bộ-dữ-liệu)
-- [KẾT QUẢ ĐẠT ĐƯỢC](#kết-quả-đạt-được)
-- [CẤU TRÚC MÃ NGUỒN](#cấu-trúc-mã-nguồn)
-- [CÔNG NGHỆ TIÊU BIỂU](#công-nghệ-tiêu-biểu)
-- [MỘT SỐ HÌNH ẢNH](#một-số-hình-ảnh)
-
-## GIỚI THIỆU TỔNG QUÁT
-
-Đây là dự án xây dựng một **Web App dịch thuật văn bản một chiều từ Anh sang Việt (En2Vi)**, dựa trên mô hình ngôn ngữ lớn **Qwen2.5-0.5B**, được Finetune trên tập dữ liệu song ngữ Anh - Việt bằng các kỹ thuật để tối ưu tài nguyên.
-
-Bước đầu tiên của dự án là **phân tích khám phá dữ liệu** (Exploratory Data Analysis – EDA) đối với tập dữ liệu song ngữ, quá trình này diễn ra trên nền tảng **Kaggle** (trang Web cung cấp một lượng lớn GPU miễn phí) từ đó đưa ra được những kết luận quan trọng về phân bố chiều dài của cặp văn bản song ngữ.
-
-Tiếp theo là bước xây dựng mô hình, cũng diễn ra trên Kaggle. Mặc dù tập dữ liệu được chia sẵn từ Hugging Face, ta sẽ chỉ lấy một phần nhỏ vì vấn đề tài nguyên, với phân bố Train/Validation/Test tương ứng với **25000/2000/2000 mẫu** dữ liệu. Sau đó sẽ tiến hành lọc dữ liệu theo độ dài Token để mô hình có thể học hiệu quả:
-
-1. Câu tiếng Anh có độ dài trong khoảng **(5, 40)** Token
-2. Câu tiếng Việt có độ dài trong khoảng **(5, 50)** Token
-
-Sau đó tiến hành điều chỉnh **Prompt** để phù hợp với cấu trúc của mô hình Qwen, cũng như xây dựng **Tokenization** cho tập Train và Validation để đảm bảo tính nhất quán của dữ liệu khi huấn luyện. Bước tiếp theo là tải mô hình Base **Qwen2.5-0.5B**, kết hợp với việc cấu hình kỹ thuật **LoRA (Low-Rank Adaptation)** để Finetune mô hình được tốt hơn. Nói thêm một chút, kỹ thuật này cho phép:
-
-1. Giảm số lượng tham số cần huấn luyện.
-2. Tiết kiệm bộ nhớ GPU.
-3. Phù hợp với môi trường huấn luyện có tài nguyên hạn chế.
-
-Sau bước này thì vào giai đoạn cấu hình tham số huấn luyện bằng thư viện **TrainingArguments**, và huấn luyện bằng **SFTTrainer**. Trong suốt quá trình huấn luyện, các đoạn **Log** được ghi lại để đánh giá mô hình bằng nhiều biểu đồ khác nhau (Accuracy/Loss). Ngoài ra, ta cũng sử dụng các chỉ số như **BLEU** và **ROUGE** khi đánh giá trên tập dữ liệu Test để xem khả năng tổng quát hoá và chất lượng dịch thuật của mô hình.
-
-Để thử nghiệm với dữ liệu mới (Inference), ta đưa vào một câu tiếng Anh cơ bản. Tiến hành tải lại mô hình Base và mô hình mới vừa được Finetune, sau đó áp dụng Prompt và Tokenizer đã được xây dựng từ trước để xem được bản dịch tiếng Việt tương ứng. Kết thúc của quá trình huấn luyện chính là đóng gói mô hình thành Zip để tiện cho việc tải xuống.
-
-Bước thứ hai, tải mô hình đã đóng gói vào phần Web App được xây dựng từ **Flask** Backend, kết hợp với giao diện **HTML** đơn giản. Khi tương tác trên trình duyệt, ta nhập vào văn bản là tiếng Anh thì kết quả nhận được kết quả chính là văn bản dịch thuật bằng tiếng Việt.
-
-## BỘ DỮ LIỆU
-
-Đường dẫn Dataset: https://huggingface.co/datasets/ncduy/mt-en-vi
-
-Tập dữ liệu của dự án này có tên là **mt-en-vi**, một tập dữ liệu song ngữ Anh – Việt (English – Vietnamese), liên quan đến những văn bản song ngữ được tổng hợp từ nhiều nguồn tiếng Anh - Việt khác nhau. Tập dữ liệu nằm trên trang Web Hugging Face, nơi lưu trữ các tập dữ liệu cũng như mô hình nổi tiếng và uy tín.
-
-**Thông tin mô tả của Dataset:** Chứa những cặp câu song song giữa hai ngôn ngữ Anh - Việt, với ba thuộc tính chính:
-
-1. **en:** Câu văn bản bằng tiếng Anh.
-2. **vi:** Câu văn bản bằng tiếng Việt.
-3. **source:** Nguồn gốc của cặp câu song ngữ (OpenSubtitles v2018, TED2020 v1, QED v2.0a, WikiMatrix v1, wikimedia v20210402, vietnamsongngu.com, baosongngu.net, Tatoeba v2021-07-22)
-
-Tập dữ liệu này đã được chia sẵn trên Hugging Face thành ba tập **Train/Validation/Test**, do đó trong quá trình sử dụng có thể không cần tự chia lại dữ liệu.
-
-## KẾT QUẢ ĐẠT ĐƯỢC
-
-Dưới đây là các thông số đạt được trong quá trình xây dựng dự án:
-
-- BLEU (0.2557): Giá trị cho thấy bản dịch đạt mức chấp nhận được, mô hình dịch đúng ý chính nhưng chưa trùng khớp cao về hình thức câu.
-
-- ROUGE-1 (0.6366): Giá trị cao chứng tỏ mô hình nắm tốt từ vựng quan trọng và bảo toàn nội dung chính của câu dịch.
-
-- ROUGE-2 (0.3897): Mức điểm cho thấy mô hình tạo được nhiều cụm từ hợp lý, dù cấu trúc câu vẫn còn khác so với tham chiếu.
-
-- ROUGE-L (0.5534): Giá trị thể hiện khả năng giữ mạch nội dung khá tốt, bản dịch nhìn chung liền mạch và dễ hiểu.
-
-- ROUGE-Lsum (0.5533): Kết quả xác nhận chất lượng dịch ổn định trên toàn câu, ít lỗi lặp và không làm sai lệch ý nghĩa tổng thể.
-
-Mặc dù kết quả nhìn có vẻ khả quan, nhưng nếu xét nhiều trường hợp thực nghiệm thì kết quả dịch thuật chưa được như mong muốn.
-
-## CẤU TRÚC MÃ NGUỒN
-
-[backend](backend/) : Chứa mã nguồn của Backend Flask.<br>
-[model](model/) : Chứa mô hình được đóng gói.<br>
-[notebook](notebook/) : Chứa các Notebook trực quan hóa dữ liệu và huấn luyện mô hình.<br>
-[picture](picture/) : Chứa danh mục hình ảnh.
-
-## CÔNG NGHỆ TIÊU BIỂU
-
-Một số công nghệ được áp dụng trong dự án: Python, Flask, PyTorch, Hugging Face Transformers, PEFT (LoRA)
-
-## MỘT SỐ HÌNH ẢNH
-
-<p align="center">
-  <img src="picture/translation_app.png" width="800">
-</p>
-
-<p align="center"><i>Pipeline tổng thể của dự án.</i></p>
+<div align="center">
+  <strong>English</strong> 
+  •
+  <a href="README.vi.md"><strong>Vietnamese</strong></a>
+</div>
 
 <br>
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Dataset](#dataset)
+- [Results](#results)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [License](#license)
+
+## Overview
+
+This is a project to build a **Web App for one-way text translation from English to Vietnamese**, based on the large language model **Qwen2.5-0.5B**, fine-tuned on an English-Vietnamese bilingual dataset using techniques to optimize resources.
+
+Below is a summary of the entire project development process:
+
+<div align="center">
+  <a href="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/translation_app.png" target="_blank">
+    <img src="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/translation_app.png"
+         alt="Overall architecture of the Translation App project" width="700">
+  </a>
+</div>
+
 <p align="center">
-  <img src="picture/sentence_length_distribution.png" width="800">
+  <strong>Figure 1:</strong> Overall architecture of the Translation App project
 </p>
 
-<p align="center"><i>Phân bố độ dài chuỗi dữ liệu đầu vào.</i></p>
+The first step of the project is **Exploratory Data Analysis (EDA)** on the bilingual dataset. This process takes place on the **Kaggle** platform (a website providing large amounts of free GPU), which draws important conclusions about the distribution of the length of bilingual text pairs.
 
+Next is the model building step, which also takes place on Kaggle. Although the dataset is pre-split from Hugging Face, we only take a small portion due to resource constraints, with Train/Validation/Test distribution corresponding to **25000/2000/2000 data samples**. We then proceed to filter data by token length so that the model can learn efficiently:
+
+1. English sentences have length in the range **(5, 40)** tokens
+2. Vietnamese sentences have length in the range **(5, 50)** tokens
+
+After that, we adjust the **Prompt** to match the structure of the Qwen model, as well as build **Tokenization** for the Train and Validation sets to ensure data consistency during training. The next step is to load the **Qwen2.5-0.5B** base model, combined with configuring the **LoRA (Low-Rank Adaptation)** technique to better fine-tune the model. This technique allows:
+
+1. Reducing the number of parameters that need to be trained.
+2. Saving GPU memory.
+3. Suitable for training environments with limited resources.
+
+After this step, we move to the stage of configuring training parameters using the **TrainingArguments** library and training with **SFTTrainer**. Throughout the training process, **Log** segments are recorded to evaluate the model with various charts (Accuracy/Loss). Additionally, we also use metrics such as **BLEU** and **ROUGE** when evaluating on the Test dataset to see the model's generalization ability and translation quality.
+
+For testing with new data (Inference), we input a basic English sentence. We proceed to reload the base model and the newly fine-tuned model, then apply the Prompt and Tokenizer that were built previously to see the corresponding Vietnamese translation. The end of the training process is packaging the model into a Zip file for easy downloading.
+
+The second step is to load the packaged model into the Web App part built with **Flask** Backend, combined with a simple **HTML** interface. When interacting on the browser, we input English text and the result is the translated Vietnamese text.
+
+<div align="right">
+  <a href="#readme-top">↑ Back to top</a>
+</div>
+
+## Dataset
+
+[![Dataset](https://img.shields.io/badge/Dataset-0A66C2?style=for-the-badge&logo=huggingface&logoColor=white)](https://huggingface.co/datasets/ncduy/mt-en-vi)
+
+The dataset for this project is called **mt-en-vi**, a bilingual English-Vietnamese dataset containing parallel bilingual texts synthesized from various English-Vietnamese sources. The dataset is located on the Hugging Face website, a platform for storing well-known and reputable datasets and models.
+
+**Dataset Description:** Contains parallel sentence pairs between English and Vietnamese, with three main attributes:
+
+1. **en:** Text sentence in English.
+2. **vi:** Text sentence in Vietnamese.
+3. **source:** Source of the bilingual sentence pair (OpenSubtitles v2018, TED2020 v1, QED v2.0a, WikiMatrix v1, wikimedia v20210402, vietnamsongngu.com, baosongngu.net, Tatoeba v2021-07-22)
+
+This dataset has been pre-split on Hugging Face into three sets: **Train/Validation/Test**, so there is no need to re-split the data during use.
+
+<div align="right">
+  <a href="#readme-top">↑ Back to top</a>
+</div>
+
+## Results
+
+First are some visualizations about the model training process:
+
+<table>
+  <tr>
+    <td style="width: 47%; padding: 8px; text-align: center; vertical-align: bottom;">
+      <a href="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/token_accuracy.png" target="_blank">
+        <img src="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/token_accuracy.png" 
+             alt="Token Accuracy of the model">
+      </a>
+      <p style="margin-top: 10px;"><strong>Figure 2:</strong> Token Accuracy of the model</p>
+    </td>
+    <td style="width: 53%; padding: 8px; text-align: center; vertical-align: bottom;">
+      <a href="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/train_val_loss.png" target="_blank">
+        <img src="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/train_val_loss.png" 
+             alt="Training Loss and Validation Loss of the model">
+      </a>
+      <p style="margin-top: 10px;"><strong>Figure 3:</strong> Training Loss and Validation Loss of the model</p>
+    </td>
+  </tr>
+</table>
+
+Next are the results of evaluating the translation quality of the model:
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center; min-width: 120px;">Metric</th>
+      <th style="text-align: center; min-width: 80px;">Score</th>
+      <th style="text-align: center;">Assessment</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center; white-space: nowrap;"><strong>BLEU</strong></td>
+      <td style="text-align: center;">0.2557</td>
+      <td>Translation is acceptable, the model translates the main idea correctly but does not match well in sentence form.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center; white-space: nowrap;"><strong>ROUGE-1</strong></td>
+      <td style="text-align: center;">0.6366</td>
+      <td>High value, the model grasps important vocabulary well and preserves the main content of the translated sentence.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center; white-space: nowrap;"><strong>ROUGE-2</strong></td>
+      <td style="text-align: center;">0.3897</td>
+      <td>The model creates many reasonable phrases, although the sentence structure is still different from the reference.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center; white-space: nowrap;"><strong>ROUGE-L</strong></td>
+      <td style="text-align: center;">0.5534</td>
+      <td>Good ability to maintain content flow, translations are generally coherent and easy to understand.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center; white-space: nowrap;"><strong>ROUGE-Lsum</strong></td>
+      <td style="text-align: center;">0.5533</td>
+      <td>Stable translation quality throughout the sentence, few repetitions and does not distort the overall meaning.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div style="border-left: 5px solid #1e88e5; padding: 16px 20px; margin: 20px 0; border-radius: 6px; background-color: #f0f7ff;">
+  <p><strong style="color: #1e88e5">Note:</strong></p>
+  <p>
+    When testing the model on complex sentences, the translation results are not as expected.
+  </p>
+</div>
+
+Finally, the results obtained on the Web App interface:
+
+<details>
+  <summary><strong> Demo (Screenshot) </strong></summary>
+  
+  <br>
+  
+  <p align="center">
+    <a href="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/initial_interface.png" target="_blank">
+      <img src="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/initial_interface.png" 
+           alt="Initial interface of the project" width="700">
+    </a>
+  </p>
+  <p align="center"><strong>Figure 4:</strong> Initial interface of the project</p>
+
+<br><br>
+
+  <p align="center">
+    <a href="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/result_interface.png" target="_blank">
+      <img src="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/result_interface.png" 
+           alt="Test results on the project interface" width="700">
+    </a>
+  </p>
+  <p align="center"><strong>Figure 5:</strong> Test results on the project interface</p>
+
+</details>
+
+<div align="right">
+  <a href="#readme-top">↑ Back to top</a>
+</div>
+
+## Tech Stack
+
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![Hugging Face Transformers](https://img.shields.io/badge/Hugging_Face_Transformers-0A66C2?style=for-the-badge&logo=huggingface&logoColor=white)](https://huggingface.co/docs/transformers/index)
+[![PEFT](https://img.shields.io/badge/PEFT-0A66C2?style=for-the-badge&logo=huggingface&logoColor=white)](https://huggingface.co/docs/peft/index)
+
+<div align="right">
+  <a href="#readme-top">↑ Back to top</a>
+</div>
+
+## Project Structure
+
+**Translation-App/**<br>
+├── **[backend](backend/)** (Contains Flask Backend source code)<br>
+├── **[model](model/)** (Contains packaged model)<br>
+├── **[notebook](notebook/)** (Contains notebooks for data visualization and model training)<br>
+└── **[picture](picture/)** (Contains image directory)<br>
+
+<div align="right">
+  <a href="#readme-top">↑ Back to top</a>
+</div>
+
+## Getting Started
+
+<details>
+<summary><strong>1. Clone the Repository</strong></summary>
 <br>
 
-<p align="center">
-  <img src="picture/token_accuracy.png" width="800">
-</p>
+Open PowerShell or Terminal and run:
 
-<p align="center"><i>Độ chính xác của mô hình theo từng Token.</i></p>
+```powershell
+git clone https://github.com/baxflux/Translation-App.git
+cd Translation-App
+```
 
+</details>
+
+<details>
+<summary><strong>2. Prepare the Environment and Install Libraries</strong></summary>
 <br>
 
-<p align="center">
-  <img src="picture/train_val_loss.png" width="800">
-</p>
+Use Python 3.12+.
 
-<p align="center"><i>Biểu đồ mất mát giữa Training và Validation.</i></p>
+Create and activate a virtual environment in the `backend` directory, then install the required libraries.
 
+```powershell
+cd backend
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+</details>
+
+<details>
+<summary><strong>3. Access the Web App System</strong></summary>
 <br>
 
-<p align="center">
-  <img src="picture/initial_interface.png" width="800">
-</p>
+From the `backend` directory, run:
 
-<p align="center"><i>Giao diện của dự án.</i></p>
+```powershell
+python run.py
+```
 
-<br>
+After Flask Server starts, open your browser and visit:
 
-<p align="center">
-  <img src="picture/result_interface.png" width="800">
-</p>
+```text
+http://127.0.0.1:5000
+```
 
-<p align="center"><i>Kết quả thực nghiệm trên giao diện.</i></p>
+</details>
+
+<div align="right">
+  <a href="#readme-top">↑ Back to top</a>
+</div>
+
+## License
+
+This project is released under the **MIT License**.
+
+See the full license content at [LICENSE](LICENSE).
+
+<div align="right">
+  <a href="#readme-top">↑ Back to top</a>
+</div>
