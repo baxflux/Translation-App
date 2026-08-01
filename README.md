@@ -2,8 +2,8 @@
 
 <h1 align="center">Translation App</h1>
 
-<h4 align="center" style="color: #555">
-  An application for translating from English to Vietnamese
+<h4 align="center">
+  <em>An application for translating from English to Vietnamese</em>
 </h4>
 
 <div align="center">
@@ -88,19 +88,19 @@ First are some visualizations about the model training process:
 
 <table>
   <tr>
-    <td style="width: 47%; padding: 8px; text-align: center; vertical-align: bottom;">
-      <a href="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/token_accuracy.png" target="_blank">
-        <img src="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/token_accuracy.png" 
-             alt="Token Accuracy of the model">
+    <td width="47%" align="center" valign="bottom">
+      <a href="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/token_accuracy.png">
+        <img src="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/token_accuracy.png" alt="Token Accuracy of the model">
       </a>
-      <p style="margin-top: 10px;"><strong>Figure 2:</strong> Token Accuracy of the model</p>
+      <br>
+      <strong>Figure 2:</strong> Token Accuracy of the model
     </td>
-    <td style="width: 53%; padding: 8px; text-align: center; vertical-align: bottom;">
-      <a href="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/train_val_loss.png" target="_blank">
-        <img src="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/train_val_loss.png" 
-             alt="Training Loss and Validation Loss of the model">
+    <td width="53%" align="center" valign="bottom">
+      <a href="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/train_val_loss.png">
+        <img src="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/train_val_loss.png" alt="Training Loss and Validation Loss of the model">
       </a>
-      <p style="margin-top: 10px;"><strong>Figure 3:</strong> Training Loss and Validation Loss of the model</p>
+      <br>
+      <strong>Figure 3:</strong> Training Loss and Validation Loss of the model
     </td>
   </tr>
 </table>
@@ -117,44 +117,40 @@ Next are the results of evaluating the translation quality of the model:
   </thead>
   <tbody>
     <tr>
-      <td style="text-align: center; white-space: nowrap;"><strong>BLEU</strong></td>
-      <td style="text-align: center;">0.2557</td>
+      <td align="center"><strong>BLEU</strong></td>
+      <td align="center">0.2557</td>
       <td>Translation is acceptable, the model translates the main idea correctly but does not match well in sentence form.</td>
     </tr>
     <tr>
-      <td style="text-align: center; white-space: nowrap;"><strong>ROUGE-1</strong></td>
-      <td style="text-align: center;">0.6366</td>
+      <td align="center"><strong>ROUGE-1</strong></td>
+      <td align="center">0.6366</td>
       <td>High value, the model grasps important vocabulary well and preserves the main content of the translated sentence.</td>
     </tr>
     <tr>
-      <td style="text-align: center; white-space: nowrap;"><strong>ROUGE-2</strong></td>
-      <td style="text-align: center;">0.3897</td>
+      <td align="center"><strong>ROUGE-2</strong></td>
+      <td align="center">0.3897</td>
       <td>The model creates many reasonable phrases, although the sentence structure is still different from the reference.</td>
     </tr>
     <tr>
-      <td style="text-align: center; white-space: nowrap;"><strong>ROUGE-L</strong></td>
-      <td style="text-align: center;">0.5534</td>
+      <td align="center"><strong>ROUGE-L</strong></td>
+      <td align="center">0.5534</td>
       <td>Good ability to maintain content flow, translations are generally coherent and easy to understand.</td>
     </tr>
     <tr>
-      <td style="text-align: center; white-space: nowrap;"><strong>ROUGE-Lsum</strong></td>
-      <td style="text-align: center;">0.5533</td>
+      <td align="center"><strong>ROUGE-Lsum</strong></td>
+      <td align="center">0.5533</td>
       <td>Stable translation quality throughout the sentence, few repetitions and does not distort the overall meaning.</td>
     </tr>
   </tbody>
 </table>
 
-<div style="border-left: 5px solid #1e88e5; padding: 16px 20px; margin: 20px 0; border-radius: 6px; background-color: #f0f7ff;">
-  <p><strong style="color: #1e88e5">Note:</strong></p>
-  <p>
-    When testing the model on complex sentences, the translation results are not as expected.
-  </p>
-</div>
+> [!NOTE]
+> When testing the model on complex sentences, the translation results are not as expected.
 
 Finally, the results obtained on the Web App interface:
 
 <details>
-  <summary><strong> Demo (Screenshot) </strong></summary>
+  <summary><strong>Demo (Screenshot)</strong></summary>
   
   <br>
   
@@ -175,6 +171,16 @@ Finally, the results obtained on the Web App interface:
     </a>
   </p>
   <p align="center"><strong>Figure 5:</strong> Test results on the project interface</p>
+
+<br><br>
+
+  <p align="center">
+    <a href="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/detail_interface.png" target="_blank">
+      <img src="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/detail_interface.png" 
+           alt="Detailed information about the translation history" width="700">
+    </a>
+  </p>
+  <p align="center"><strong>Figure 6:</strong> Detailed information about the translation history</p>
 
 </details>
 

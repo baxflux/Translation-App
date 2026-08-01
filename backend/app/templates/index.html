@@ -2,56 +2,101 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>En2Vi Translator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translator</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='image/favicon.png') }}">
 </head>
 <body>
 
-<div class="container">
-    <h2>En2Vi Translator</h2>
-
-    <form method="post">
-
-        <div class="row">
-            <label class="label">English text</label>
-            <textarea
-                id="source_text"
-                name="text"
-                rows="8"
-                placeholder="Enter English text here..."
-            >{{ source_text }}</textarea>
+<div class="app-shell">
+    <header class="app-header">
+        <div>
+            <h1>Translator</h1>
+            <p>One-way English to Vietnamese translation tool.</p>
         </div>
-
-        <div class="row">
-            <label class="label">Max tokens per chunk</label>
-            <select name="max_tokens">
-                <option value="256" {% if max_tokens == 256 %}selected{% endif %}>256</option>
-                <option value="512" {% if max_tokens == 512 %}selected{% endif %}>512</option>
-                <option value="768" {% if max_tokens == 768 %}selected{% endif %}>768</option>
-                <option value="1024" {% if max_tokens == 1024 %}selected{% endif %}>1024</option>
-            </select>
-        </div>
-
-        <div class="row buttons">
-            <button type="submit">Translate</button>
+        <div class="button-group">
+            <button type="button" onclick="document.querySelector('form').submit()">Translate</button>
             <button type="button" class="clear-btn" onclick="clearText()">Clear</button>
         </div>
+    </header>
 
+    <form method="post" class="translator-form">
+        <div class="pane-grid">
+            <section class="pane pane-left">
+                <div class="pane-title">English</div>
+                <textarea
+                    id="source_text"
+                    name="text"
+                    placeholder="Type English text here..."
+                >{{ source_text }}</textarea>
+            </section>
+
+            <section class="pane pane-right">
+                <div class="pane-title">Vietnamese</div>
+                <textarea
+                    id="translation"
+                    readonly
+                    placeholder="Translation will appear here..."
+                >{{ translation }}</textarea>
+            </section>
+        </div>
+        <input type="hidden" id="duration_input" value="{{ duration }}">
     </form>
 
-    <div class="row">
-        <label class="label">Vietnamese translation</label>
-        <textarea
-            id="translation"
-            rows="8"
-            readonly
-            placeholder="Translation will appear here..."
-        >{{ translation }}</textarea>
+    <section class="history-panel">
+        <div class="history-header">Translation History</div>
+        <div id="historyList" class="history-list">
+            <div class="history-empty">No history yet. Translate a sentence to save entries.</div>
+        </div>
+    </section>
+
+    <div id="historyModal" class="modal hidden">
+        <div class="modal-backdrop" onclick="closeHistoryModal()"></div>
+        <div class="modal-body">
+            <div class="modal-header">
+                <div>
+                    <h2>Translation Details</h2>
+                    <p id="modalTimestamp"></p>
+                </div>
+                <button type="button" class="modal-close" onclick="closeHistoryModal()">✕</button>
+            </div>
+            <div class="modal-content">
+                <div class="modal-section">
+                    <div class="modal-label">English</div>
+                    <div id="modalSource" class="modal-text"></div>
+                </div>
+                <div class="modal-section">
+                    <div class="modal-label">Vietnamese</div>
+                    <div id="modalTarget" class="modal-text"></div>
+                </div>
+                <div class="modal-metadata" id="modalMetadata"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="expandModal" class="modal hidden">
+        <div class="modal-backdrop" onclick="closeExpandModal()"></div>
+        <div class="modal-body">
+            <div class="modal-header">
+                <div>
+                    <h2>Expand Input</h2>
+                    <p>Enter or paste your text here</p>
+                </div>
+                <button type="button" class="modal-close" onclick="closeExpandModal()">✕</button>
+            </div>
+            <div class="modal-content">
+                <textarea id="expandTextarea" class="expand-textarea" placeholder="Type or paste your text here..."></textarea>
+                <div class="modal-footer">
+                    <button type="button" class="modal-btn cancel-btn" onclick="closeExpandModal()">Cancel</button>
+                    <button type="button" class="modal-btn submit-btn" onclick="submitExpandModal()">Done</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-
 </body>
 </html>

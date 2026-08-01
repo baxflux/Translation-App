@@ -2,8 +2,8 @@
 
 <h1 align="center">Translation App</h1>
 
-<h4 align="center" style="color: #555">
-  Ứng dụng dịch thuật từ tiếng Anh sang tiếng Việt
+<h4 align="center">
+  <em>Ứng dụng dịch thuật từ tiếng Anh sang tiếng Việt</em>
 </h4>
 
 <div align="center">
@@ -88,19 +88,19 @@ Tập dữ liệu này đã được chia sẵn trên Hugging Face thành ba t�
 
 <table>
   <tr>
-    <td style="width: 47%; padding: 8px; text-align: center; vertical-align: bottom;">
-      <a href="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/token_accuracy.png" target="_blank">
-        <img src="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/token_accuracy.png" 
-             alt="Token Accuracy của mô hình">
+    <td width="47%" align="center" valign="bottom">
+      <a href="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/token_accuracy.png">
+        <img src="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/token_accuracy.png" alt="Token Accuracy của mô hình">
       </a>
-      <p style="margin-top: 10px;"><strong>Hình 2:</strong> Token Accuracy của mô hình</p>
+      <br>
+      <strong>Hình 2:</strong> Token Accuracy của mô hình
     </td>
-    <td style="width: 53%; padding: 8px; text-align: center; vertical-align: bottom;">
-      <a href="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/train_val_loss.png" target="_blank">
-        <img src="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/train_val_loss.png" 
-             alt="Training Loss và Validation Loss của mô hình">
+    <td width="53%" align="center" valign="bottom">
+      <a href="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/train_val_loss.png">
+        <img src="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/train_val_loss.png" alt="Training Loss và Validation Loss của mô hình">
       </a>
-      <p style="margin-top: 10px;"><strong>Hình 3:</strong> Training Loss và Validation Loss của mô hình</p>
+      <br>
+      <strong>Hình 3:</strong> Training Loss và Validation Loss của mô hình
     </td>
   </tr>
 </table>
@@ -117,44 +117,40 @@ Tiếp theo là về kết quả đánh giá chất lượng mô hình dịch th
   </thead>
   <tbody>
     <tr>
-      <td style="text-align: center; white-space: nowrap;"><strong>BLEU</strong></td>
-      <td style="text-align: center;">0.2557</td>
+      <td align="center"><strong>BLEU</strong></td>
+      <td align="center">0.2557</td>
       <td>Bản dịch đạt mức chấp nhận được, mô hình dịch đúng ý chính nhưng chưa trùng khớp cao về hình thức câu.</td>
     </tr>
     <tr>
-      <td style="text-align: center; white-space: nowrap;"><strong>ROUGE-1</strong></td>
-      <td style="text-align: center;">0.6366</td>
+      <td align="center"><strong>ROUGE-1</strong></td>
+      <td align="center">0.6366</td>
       <td>Giá trị cao, mô hình nắm tốt từ vựng quan trọng và bảo toàn nội dung chính của câu dịch.</td>
     </tr>
     <tr>
-      <td style="text-align: center; white-space: nowrap;"><strong>ROUGE-2</strong></td>
-      <td style="text-align: center;">0.3897</td>
+      <td align="center"><strong>ROUGE-2</strong></td>
+      <td align="center">0.3897</td>
       <td>Mô hình tạo được nhiều cụm từ hợp lý, dù cấu trúc câu vẫn còn khác so với tham chiếu.</td>
     </tr>
     <tr>
-      <td style="text-align: center; white-space: nowrap;"><strong>ROUGE-L</strong></td>
-      <td style="text-align: center;">0.5534</td>
+      <td align="center"><strong>ROUGE-L</strong></td>
+      <td align="center">0.5534</td>
       <td>Khả năng giữ mạch nội dung khá tốt, bản dịch nhìn chung liền mạch và dễ hiểu.</td>
     </tr>
     <tr>
-      <td style="text-align: center; white-space: nowrap;"><strong>ROUGE-Lsum</strong></td>
-      <td style="text-align: center;">0.5533</td>
+      <td align="center"><strong>ROUGE-Lsum</strong></td>
+      <td align="center">0.5533</td>
       <td>Chất lượng dịch ổn định trên toàn câu, ít lỗi lặp và không làm sai lệch ý nghĩa tổng thể.</td>
     </tr>
   </tbody>
 </table>
 
-<div style="border-left: 5px solid #1e88e5; padding: 16px 20px; margin: 20px 0; border-radius: 6px; background-color: #f0f7ff;">
-  <p><strong style="color: #1e88e5">Ghi chú:</strong></p>
-  <p>
-    Mô hình khi thực nghiệm trên những câu nói phức tạp thì kết quả dịch thuật chưa được như mong muốn.
-  </p>
-</div>
+> [!NOTE]
+> Mô hình khi thực nghiệm trên những câu nói phức tạp thì kết quả dịch thuật chưa được như mong muốn.
 
 Cuối cùng là kết quả nhận được trên giao diện Web App:
 
 <details>
-  <summary><strong> Demo (Ảnh chụp màn hình) </strong></summary>
+  <summary><strong>Demo (Ảnh chụp màn hình)</strong></summary>
   
   <br>
   
@@ -175,6 +171,16 @@ Cuối cùng là kết quả nhận được trên giao diện Web App:
     </a>
   </p>
   <p align="center"><strong>Hình 5:</strong> Kết quả thực nghiệm trên giao diện của dự án</p>
+
+<br><br>
+
+  <p align="center">
+    <a href="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/detail_interface.png" target="_blank">
+      <img src="https://raw.githubusercontent.com/baxflux/Translation-App/main/picture/detail_interface.png" 
+           alt="Thông tin chi tiết về lịch sử dịch thuật" width="700">
+    </a>
+  </p>
+  <p align="center"><strong>Hình 6:</strong> Thông tin chi tiết về lịch sử dịch thuật</p>
 
 </details>
 

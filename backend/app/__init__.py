@@ -10,4 +10,11 @@ def create_app():
     from app.routes.translate import translate_bp
     app.register_blueprint(translate_bp)
 
+    # Load model after server starts (lazy loading on first request)
+    @app.before_request
+    def ensure_model_loaded():
+        from app.services import translator
+        if not translator.model_loaded:
+            translator.load_model()
+
     return app

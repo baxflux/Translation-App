@@ -1,6 +1,7 @@
 from pathlib import Path
 import zipfile
 import shutil
+import time
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import PeftModel
@@ -19,7 +20,18 @@ MODEL_ROOT = PROJECT_ROOT / "model"
 MODEL_ZIP_PATH = MODEL_ROOT / "qwen2.5-0.5b-lora-model.zip"
 MODEL_DIR = MODEL_ROOT / "qwen2.5-0.5b-lora-model"
 
+BASE_MODEL = "Qwen/Qwen2.5-0.5B"
+DEFAULT_MAX_INPUT_TOKENS = 512
+MAX_NEW_TOKENS = 256
+
+# Global variables for model and tokenizer
+tokenizer = None
+base_model = None
+model = None
+model_loaded = False
+
 def ensure_model_ready():
+    """Prepare model files from zip"""
     if MODEL_DIR.exists():
         print(">>> Removing extracted model directory...")
         shutil.rmtree(MODEL_DIR)
@@ -43,30 +55,37 @@ def ensure_model_ready():
 
     print(">>> Model ready.")
 
-ensure_model_ready()
+def load_model():
+    """Load model and tokenizer (lazy loading - called after server starts)"""
+    global tokenizer, base_model, model, model_loaded
+    
+    if model_loaded:
+        return
+    
+    print("\n>>> Loading Qwen2.5 base model and LoRA adapter...")
+    ensure_model_ready()
+    
+    tokenizer = AutoTokenizer.from_pretrained(
+        BASE_MODEL,
+        trust_remote_code=True
+    )
+    tokenizer.pad_token = tokenizer.eos_token
 
-BASE_MODEL = "Qwen/Qwen2.5-0.5B"
-DEFAULT_MAX_INPUT_TOKENS = 512
-MAX_NEW_TOKENS = 256
+    base_model = AutoModelForCausalLM.from_pretrained(
+        BASE_MODEL,
+        dtype=torch.float32,
+        device_map="cpu",
+        trust_remote_code=True
+    )
 
-tokenizer = AutoTokenizer.from_pretrained(
-    BASE_MODEL,
-    trust_remote_code=True
-)
-tokenizer.pad_token = tokenizer.eos_token
-
-base_model = AutoModelForCausalLM.from_pretrained(
-    BASE_MODEL,
-    dtype=torch.float32,
-    device_map="cpu",
-    trust_remote_code=True
-)
-
-model = PeftModel.from_pretrained(
-    base_model,
-    MODEL_DIR
-)
-model.eval()
+    model = PeftModel.from_pretrained(
+        base_model,
+        MODEL_DIR
+    )
+    model.eval()
+    
+    model_loaded = True
+    print(">>> Model loaded successfully!\n")
 
 def _translate_chunk(text: str) -> str:
     prompt = build_prompt(text)
@@ -85,12 +104,20 @@ def _translate_chunk(text: str) -> str:
     decoded = tokenizer.decode(outputs[0], skip_special_tokens=True)
     return decoded.split("Vietnamese:")[-1].strip()
 
-def translate_long_text(text: str, max_tokens: int = DEFAULT_MAX_INPUT_TOKENS) -> str:
+def translate_long_text(text: str, max_tokens: int = DEFAULT_MAX_INPUT_TOKENS) -> tuple:
+    """Translate text and return (translation, duration_in_seconds)"""
+    # Ensure model is loaded
+    if not model_loaded:
+        load_model()
+    
+    start_time = time.time()
+    
     text = preprocess_input(text)
 
     sentences = split_into_sentences(text)
     if not sentences:
-        return ""
+        duration = time.time() - start_time
+        return "", round(duration, 2)
 
     chunks = build_chunks(
         sentences=sentences,
@@ -103,4 +130,5 @@ def translate_long_text(text: str, max_tokens: int = DEFAULT_MAX_INPUT_TOKENS) -
         vi = _translate_chunk(chunk)
         translations.append(vi)
 
-    return "\n".join(translations)
+    duration = time.time() - start_time
+    return "\n".join(translations), round(duration, 2)
